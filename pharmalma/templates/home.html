@@ -61,23 +61,84 @@
         }
     </style>
     <script>
-        function redirectToCarte(event) {
-            event.preventDefault(); // Empêche le formulaire de se soumettre normalement
-
-            // Récupération des valeurs des champs
-            const ville = document.getElementById("ville").value;
-            const medicament = document.getElementById("medicament").value;
-
-            //TODO: récuperer les points des pharma ayant le med en stock
-            //return sous forme [{"lat":47.344062,"lng":-1.5289619},{"lat":47.341824,"lng":-1.526767}]
-            //point = getPharma(medicament)
-
-            // Construction de l'URL avec les paramètres
-            const url = `/carte?ville=${encodeURIComponent(ville)}&points=[{"lat":47.344062,"lng":-1.5289619},{"lat":47.341824,"lng":-1.526767}]`;
-
-            // Redirection vers l'URL construite
-            window.location.href = url;
-        }
+        document.addEventListener("DOMContentLoaded", function() {
+            const csrfToken = '{{ csrf_token }}'; // Assurez-vous que le jeton CSRF est correctement récupéré
+    
+            function redirectToCarte(event) {
+                event.preventDefault(); // Empêche le formulaire de se soumettre normalement
+                console.log("Le bouton a été cliqué."); // Log pour vérifier l'appel
+    
+                // Récupération des valeurs des champs
+                const ville = document.getElementById("ville").value;
+                const medicament_name = document.getElementById("medicament").value;
+                console.log("Ville :", ville, "Médicament :", medicament_name); // Log pour voir les valeurs récupérées
+    
+                // Requête AJAX pour récupérer les adresses des pharmacies
+                fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `medicament=${encodeURIComponent(medicament_name)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau : ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Données reçues :", data); // Log pour voir les données reçues
+                    const addresses = data.addresses;
+                    
+                    if (addresses.length > 0) {
+                        // Convertir les adresses en latitude/longitude
+                        const promises = addresses.map(address => {
+                            return fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyDq4tK0ZwN8tu9ZQgF6Y3TJ2EPScOCSULk`)
+                                .then(res => res.json())
+                                .then(location => {
+                                    console.log(location.results)
+                                    if (location.results.length > 0) {
+                                        console.log("true")
+                                        const { lat, lng } = location.results[0].geometry.location;
+                                        return { lat, lng };
+                                    } else {
+                                        console.log("true")
+                                        return null;
+                                    }
+                                });
+                        });
+    
+                        // Attendre que toutes les promesses se terminent
+                        Promise.all(promises).then(locations => {
+                            const url = new URL('/carte', window.location.origin);
+                            locations.forEach(location => {
+                                console.log('Locations:', locations);
+                                if (location) {
+                                    url.searchParams.append('points', JSON.stringify(location));
+                                }
+                            });
+    
+                            // Ajoutez la variable ville ici
+                            url.searchParams.append('ville', encodeURIComponent(ville)); // Correction ici
+    
+                            // Rediriger vers l'URL
+                            window.location.href = url.toString();
+                        });
+                    } else {
+                        alert('Aucune pharmacie trouvée avec ce médicament.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la requête. Vérifiez la console pour plus de détails.');
+                });
+            }
+    
+            // Attachez l'événement de soumission
+            document.querySelector('form').addEventListener('submit', redirectToCarte);
+        });
     </script>
 </head>
 <body>
