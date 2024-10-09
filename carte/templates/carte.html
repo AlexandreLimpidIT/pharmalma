@@ -16,6 +16,7 @@
             // Si la ville a été soumise via le formulaire
             var ville = "{{ ville|escapejs }}";
             if (ville) {
+                ville = decodeURIComponent(ville);
                 geocoder.geocode({'address': ville}, function(results, status) {
                     if (status === 'OK') {
                         var map = new google.maps.Map(document.getElementById('map'), {

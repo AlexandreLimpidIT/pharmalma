@@ -3,9 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <title>Bienvenue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            position: relative; /* Pour positionner le bouton */
+        }
+        .admin-button {
+            position: absolute; /* Positionnement absolu pour placer le bouton en haut à droite */
+            top: 20px; /* Espace depuis le haut */
+            right: 20px; /* Espace depuis la droite */
+            background-color: #007bff; /* Couleur de fond du bouton */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 10px 15px; /* Espacement interne */
+            border-radius: 4px; /* Coins arrondis */
+            text-decoration: none; /* Pas de soulignement */
+            font-size: 16px; /* Taille de la police */
+        }
+        .admin-button:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* Largeur maximale du formulaire */
+            margin: auto; /* Centrer le formulaire sur la page */
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 80%; /* Réduire la largeur des inputs */
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        h2 {
+            text-align: center; /* Centrer le titre */
+            color: #333; /* Couleur du texte du titre */
+        }
+    </style>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const csrfToken = '{{ csrf_token }}'; // Assurez-vous que le jeton CSRF est correctement récupéré
+
+        function redirectToCarte(event) {
+            event.preventDefault(); // Empêche le formulaire de se soumettre normalement
+            console.log("Le bouton a été cliqué."); // Log pour vérifier l'appel
+
+            // Récupération des valeurs des champs
+            const ville = document.getElementById("ville").value;
+            const medicament_name = document.getElementById("medicament").value;
+            console.log("Ville :", ville, "Médicament :", medicament_name); // Log pour voir les valeurs récupérées
+
+            // Requête AJAX pour récupérer les adresses des pharmacies
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `medicament=${encodeURIComponent(medicament_name)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau : ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Données reçues :", data); // Log pour voir les données reçues
+                const addresses = data.addresses;
+
+                if (addresses.length > 0) {
+                    // Convertir les adresses en latitude/longitude
+                    const promises = addresses.map(address => {
+                        return fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyDq4tK0ZwN8tu9ZQgF6Y3TJ2EPScOCSULk`)
+                            .then(res => res.json())
+                            .then(location => {
+                                if (location.results.length > 0) {
+                                    const { lat, lng } = location.results[0].geometry.location;
+                                    return { lat, lng };
+                                } else {
+                                    return null;
+                                }
+                            });
+                    });
+
+                    // Attendre que toutes les promesses se terminent
+                    Promise.all(promises).then(locations => {
+                        const validLocations = locations.filter(location => location !== null); // Filtrer les résultats null
+                                        
+                        // Créer un tableau d'objets avec lat et lng pour l'URL
+                        const pointsArray = validLocations.map(location => {
+                            return { lat: location.lat, lng: location.lng }; // Créer un objet {lat, lng}
+                        });
+                    
+                        const url = new URL('/carte', window.location.origin);
+                    
+                        // Ajouter tous les points sous forme de JSON dans une seule variable 'points'
+                        url.searchParams.append('points', JSON.stringify(pointsArray));
+                    
+                        // Ajouter la variable ville ici
+                        url.searchParams.append('ville', encodeURIComponent(ville));
+                    
+                        // Rediriger vers l'URL
+                        window.location.href = url.toString();
+                    });
+                } else {
+                    alert('Aucune pharmacie trouvée avec ce médicament.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue lors de la requête. Vérifiez la console pour plus de détails.');
+            });
+        }
+
+        // Attachez l'événement de soumission
+        document.querySelector('form').addEventListener('submit', redirectToCarte);
+    });
+    </script>
 </head>
 <body>
-    <h1>Bienvenue sur notre site</h1>
-    <p>Ceci est la page d'accueil.</p>
+    <a href="/admin" class="admin-button">Accès à l'espace pharmacien</a>
+
+    <form onsubmit="redirectToCarte(event)">
+        <h2>Rechercher un médicament disponible proche de chez vous</h2>
+
+        <label for="ville">Ville :</label>
+        <input type="text" id="ville" name="ville" required>
+
+        <label for="medicament">Médicament :</label>
+        <input type="text" id="medicament" name="medicament" required>
+
+        <input type="submit" value="Soumettre">
+    </form>
 </body>
 </html>
