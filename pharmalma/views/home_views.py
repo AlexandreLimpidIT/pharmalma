@@ -8,17 +8,17 @@ def home(request):
         addresses = []
 
         # Recherche les produits qui correspondent au nom donné
-        products = Medicament.objects.filter(name__icontains=product_name)
+        products = Medicament.objects.filter(nom_medoc__icontains=product_name)
 
         # Recherche les pharmacies ayant ces produits en stock
         for product in products:
-            stock_entries = Stock.objects.filter(id_prod=product.id)
+            stock_entries = Stock.objects.filter(ref_medoc=product.ref_medoc)
             for stock in stock_entries:
-                if(stock.quantite != 0):
-                    print(f"ID pharmacie : {stock.id_pharma}")
-                    pharmacy = Pharmacie.objects.filter(id=stock.id_pharma)
+                if(stock.qte != 0):
+                    print(f"ID pharmacie : {stock.id_pharma.id_pharma}")
+                    pharmacy = Pharmacie.objects.filter(id_pharma=stock.id_pharma.id_pharma)
                     for i in pharmacy :
-                        addresses.append(i.adresse)
+                        addresses.append(i.adresse_pharma)
 
         print(addresses)
 
