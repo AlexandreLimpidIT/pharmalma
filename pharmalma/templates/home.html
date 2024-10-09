@@ -25,6 +25,21 @@
         .admin-button:hover {
             background-color: #0056b3; /* Couleur au survol */
         }
+        .pharma-button {
+            position: absolute; /* Positionnement absolu pour placer le bouton en haut à droite */
+            top: 65px; /* Espace depuis le haut */
+            right: 20px; /* Espace depuis la droite */
+            background-color: #007bff; /* Couleur de fond du bouton */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 10px 15px; /* Espacement interne */
+            border-radius: 4px; /* Coins arrondis */
+            text-decoration: none; /* Pas de soulignement */
+            font-size: 16px; /* Taille de la police */
+        }
+        .pharma-button:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
         form {
             background: white;
             padding: 20px;
@@ -121,6 +136,7 @@
 </head>
 <body>
     <a href="/admin" class="admin-button">Espace admin</a>
+    <a href="/pharmacie" class="pharma-button">Espace pharmacien</a>
 
     <form onsubmit="redirectToCarte(event)">
         <h2>Rechercher un médicament disponible proche de chez vous</h2>
