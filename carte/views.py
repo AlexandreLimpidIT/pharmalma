@@ -7,9 +7,6 @@ def carte_view(request):
     ville = request.GET.get('ville')
     message = None
     points_str = request.GET.get('points')
-
-    if not ville:
-        message = "Veuillez entrer une ville"
     
     if points_str:
         try:
