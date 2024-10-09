@@ -11,7 +11,6 @@
 
     <script>
         function initMap() {
-            console.log("in!!")
             var geocoder = new google.maps.Geocoder();
 
             // Si la ville a été soumise via le formulaire
@@ -25,10 +24,6 @@
                             center: results[0].geometry.location
                         });
                         var points = JSON.parse('{{ points|escapejs }}');
-                        console.log(points)
-                        if(typeof(points) == "object"){
-                            points = [points]
-                        }
                         points.forEach(function(point) {
                             var marker = new google.maps.Marker({
                                 position: point,
@@ -47,9 +42,6 @@
                 });
 
                 var points = JSON.parse('{{ points|escapejs }}');
-                if(typeof(points) == "object"){
-                    points = [points]
-                }
                 points.forEach(function(point) {
                     var marker = new google.maps.Marker({
                         position: point,
