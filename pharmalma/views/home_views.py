@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from ..models import Pharmacie, Product, Stock
+from ..models import Pharmacie, Stock, Medicament
 
 def home(request):
     if request.method == 'POST':
@@ -8,7 +8,7 @@ def home(request):
         addresses = []
 
         # Recherche les produits qui correspondent au nom donné
-        products = Product.objects.filter(name__icontains=product_name)
+        products = Medicament.objects.filter(name__icontains=product_name)
 
         # Recherche les pharmacies ayant ces produits en stock
         for product in products:
