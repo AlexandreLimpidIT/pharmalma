@@ -16,13 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from .views.pharmacien_view import pharmacienV,stockPH,horairePH
-from .views import product_list, home
+from .views import home
 from django.urls import path, include
 
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('products/', product_list, name="product_list"),
     path('carte/', include('carte.urls')),
     path('pharmacie/',pharmacienV,name='pharmacie'),
     path('pharmacie/horairePH/',horairePH,name='horairePh'),

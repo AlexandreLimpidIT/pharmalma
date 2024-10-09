@@ -1,12 +1,8 @@
 # pharmalma/admin.py
 
 from django.contrib import admin
-from .models import Product,Horaire,Medicament,Pharmacie,Stock
+from .models import Horaire,Medicament,Pharmacie,Stock
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'cis_code', 'cip_code')  # Champs à afficher dans la liste
-    search_fields = ('name', 'cis_code', 'cip_code')         # Champ de recherche
 
 @admin.register(Horaire)
 class HoraireAdmin(admin.ModelAdmin):
@@ -18,8 +14,8 @@ class MedicamentAdmin(admin.ModelAdmin):
     search_fields = ('ref_medoc', 'nom_medoc')
 @admin.register(Pharmacie)
 class PharmacieAdmin(admin.ModelAdmin):
-    list_display = ('id_pharma', 'nom_pharma', 'adresse_pharma','latitude','longitude','telephone','id_pharmacien')
-    search_fields = ('id_pharma', 'nom_pharma', 'adresse_pharma', 'latitude', 'longitude', 'telephone','id_pharmacien')
+    list_display = ('id_pharma', 'nom_pharma', 'adresse_pharma','telephone','id_pharmacien')
+    search_fields = ('id_pharma', 'nom_pharma', 'adresse_pharma', 'telephone','id_pharmacien')
 
 @admin.register(Stock)
 class PharmacieAdmin(admin.ModelAdmin):

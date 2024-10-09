@@ -1,4 +1,3 @@
-from .product import Product
 from .horaires import Horaire
 from .medicaments import Medicament
 from .phamacies import Pharmacie
