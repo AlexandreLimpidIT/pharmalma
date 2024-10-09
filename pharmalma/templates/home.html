@@ -61,89 +61,66 @@
         }
     </style>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const csrfToken = '{{ csrf_token }}'; // Assurez-vous que le jeton CSRF est correctement récupéré
-
-        function redirectToCarte(event) {
-            event.preventDefault(); // Empêche le formulaire de se soumettre normalement
-            console.log("Le bouton a été cliqué."); // Log pour vérifier l'appel
-
-            // Récupération des valeurs des champs
-            const ville = document.getElementById("ville").value;
-            const medicament_name = document.getElementById("medicament").value;
-            console.log("Ville :", ville, "Médicament :", medicament_name); // Log pour voir les valeurs récupérées
-
-            // Requête AJAX pour récupérer les adresses des pharmacies
-            fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `medicament=${encodeURIComponent(medicament_name)}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau : ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Données reçues :", data); // Log pour voir les données reçues
-                const addresses = data.addresses;
-
-                if (addresses.length > 0) {
-                    // Convertir les adresses en latitude/longitude
-                    const promises = addresses.map(address => {
-                        return fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=AIzaSyDq4tK0ZwN8tu9ZQgF6Y3TJ2EPScOCSULk`)
-                            .then(res => res.json())
-                            .then(location => {
-                                if (location.results.length > 0) {
-                                    const { lat, lng } = location.results[0].geometry.location;
-                                    return { lat, lng };
-                                } else {
-                                    return null;
-                                }
-                            });
-                    });
-
-                    // Attendre que toutes les promesses se terminent
-                    Promise.all(promises).then(locations => {
-                        const validLocations = locations.filter(location => location !== null); // Filtrer les résultats null
-                                        
-                        // Créer un tableau d'objets avec lat et lng pour l'URL
-                        const pointsArray = validLocations.map(location => {
-                            return { lat: location.lat, lng: location.lng }; // Créer un objet {lat, lng}
+        document.addEventListener("DOMContentLoaded", function() {
+            const csrfToken = '{{ csrf_token }}';
+        
+            function redirectToCarte(event) {
+                event.preventDefault(); 
+                console.log("Le bouton a été cliqué."); 
+        
+                const ville = document.getElementById("ville").value;
+                const medicament_name = document.getElementById("medicament").value;
+                console.log("Ville :", ville, "Médicament :", medicament_name); 
+        
+                fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `medicament=${encodeURIComponent(medicament_name)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau : ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Données reçues :", data);
+                    const pharmacies = data.pharmacies;
+        
+                    if (pharmacies.length > 0) {
+                        const pointsArray = pharmacies.map(pharmacy => {
+                            return { 
+                                lat: pharmacy.lat, 
+                                lng: pharmacy.lng, 
+                                nom: pharmacy.nom, 
+                                adresse: pharmacy.adresse, 
+                                telephone: pharmacy.telephone 
+                            }; 
                         });
-                    
+        
                         const url = new URL('/carte', window.location.origin);
-                    
-                        // Ajouter tous les points sous forme de JSON dans une seule variable 'points'
                         url.searchParams.append('points', JSON.stringify(pointsArray));
-                    
-                        // Ajouter la variable ville ici
                         url.searchParams.append('ville', encodeURIComponent(ville));
-                    
-                        // Rediriger vers l'URL
                         window.location.href = url.toString();
-                    });
-                } else {
-                    alert('Aucune pharmacie trouvée avec ce médicament.');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue lors de la requête. Vérifiez la console pour plus de détails.');
-            });
-        }
-
-        // Attachez l'événement de soumission
-        document.querySelector('form').addEventListener('submit', redirectToCarte);
-    });
-    </script>
+                    } else {
+                        alert('Aucune pharmacie trouvée avec ce médicament.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la requête. Vérifiez la console pour plus de détails.');
+                });
+            }
+        
+            document.querySelector('form').addEventListener('submit', redirectToCarte);
+        });
+        </script>
 </head>
 <body>
-    <a href="/admin" class="admin-button">Accès à l'espace pharmacien</a>
+    <a href="/admin" class="admin-button">Espace admin</a>
 
     <form onsubmit="redirectToCarte(event)">
         <h2>Rechercher un médicament disponible proche de chez vous</h2>
