@@ -1,51 +1,84 @@
-{% extends 'templates/pharmacie.html'%}
+{% extends 'templates/pharmacie.html' %}
 {% block content %}
-<h2>Horaires de la Pharmacie: {{ pharmacie.nom_pharma }}</h2>
-<form method="post">
-    {% csrf_token %}
-    <label for="jour">Sélectionner le jour:</label>
-    <select name="jour" required>
-        {% for jour in jours %}
-            <option value="{{ jour }}">{{ jour }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Afficher Horaires</button>
-</form>
+<div class="p-10">
+    <form method="POST" class="space-y-6" id="mainForm">
+        {% csrf_token %}
+        
+        <!-- Afficher les jours de la semaine -->
+        <div>
+            <label class="block text-lg font-semibold mb-2">Jour :</label>
+            <select id="daySelect" name="day" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="monday">Lundi</option>
+                <option value="tuesday">Mardi</option>
+                <option value="wednesday">Mercredi</option>
+                <option value="thursday">Jeudi</option>
+                <option value="friday">Vendredi</option>
+                <option value="saturday">Samedi</option>
+                <option value="sunday">Dimanche</option>
+            </select>
+        </div>
 
-{% if horaires %}
-    <h3>Horaires pour {{ selected_jour }}:</h3>
-    <table>
-        <tr>
-            <th>Période</th>
-            <th>Heure Début</th>
-            <th>Heure Fin</th>
-            <th>Modifier</th>
-        </tr>
-        {% for horaire in horaires %}
-            <tr>
-                <td>{{ horaire.periode }}</td>
-                <form method="post" action="{% url 'modifier_horaire' pharmacie.id_pharma horaire.id %}">
-                    {% csrf_token %}
-                    <td>
-                        <input type="time" name="h_debut" value="{{ horaire.h_debut|slice:':5' }}"> <!-- Pré-remplir -->
-                    </td>
-                    <td>
-                        <input type="time" name="h_fin" value="{{ horaire.h_fin|slice:':5' }}"> <!-- Pré-remplir -->
-                    </td>
-                    <td>
-                        <button type="submit">Modifier</button>
-                    </td>
-                </form>
-            </tr>
-        {% endfor %}
-    </table>
-{% endif %}
+        <!-- Période -->
+        <div>
+            <label class="block text-lg font-semibold mb-2">Période :</label>
+            <select id="periodSelect" name="period" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="Matin">Matin</option>
+                <option value="Soir">Soir</option>
+            </select>
+        </div>
 
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+        <div class="flex justify-center">
+            <button type="button" id="searchButton" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Recherche</button>
+        </div>
+        
+        <div id="resultForm" class="mt-4" style="display:none;">
+            <h3 class="text-lg font-semibold">Résultats :</h3>
+            <p id="selectedDay"></p>
+            <p id="selectedPeriod"></p>
+
+            <!-- Heures -->
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="open_time" class="block text-lg font-semibold mb-2">Heure d'ouverture :</label>
+                    <input type="time" name="open_time" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="w-1/2">
+                    <label for="close_time" class="block text-lg font-semibold mb-2">Heure de fermeture :</label>
+                    <input type="time" name="close_time" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <input type="checkbox" name="is_open" id="is_open" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                <label for="is_open" class="ml-2 block text-sm text-gray-900">Est de garde</label>
+            </div>
+
+            <div class="flex justify-center mt-4">
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Sauvegarder</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const selectedDay = document.getElementById('daySelect').value;
+            const selectedPeriod = document.getElementById('periodSelect').value;
+
+            // Afficher les valeurs sélectionnées
+            document.getElementById('selectedDay').innerText = `Jour sélectionné : ${selectedDay}`;
+            document.getElementById('selectedPeriod').innerText = `Période sélectionnée : ${selectedPeriod}`;
+
+            // Afficher le bloc de résultats
+            document.getElementById('resultForm').style.display = 'block';
+        });
+    </script>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
 {% endblock %}

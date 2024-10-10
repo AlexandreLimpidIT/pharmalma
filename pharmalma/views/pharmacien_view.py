@@ -24,7 +24,7 @@ def horairePH(request, pharmacie_id):
     if selected_jour:
         horaires = Horaire.objects.filter(id_pharma=pharmacie, jour=selected_jour)
     
-    print(horaires[0].h_debut)
+    #print(horaires[0].h_debut)
 
     # Rendre la page avec les horaires existants
     return render(request, 'templates/horaireForm.html', {
