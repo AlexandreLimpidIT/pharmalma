@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from .views.pharmacien_view import pharmacienV,stockPH,horairePH,modifier_horaire, renderStockPh
-from .views.home_views import home, pharmacie_redirect_view, product_list
+from .views.home_views import home, pharmacie_redirect_view
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
