@@ -25,7 +25,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('carte/', include('carte.urls')),
-    #path('pharmacie/',pharmacienV,name='pharmacie'),
     path('pharmacie/horairePH/',horairePH,name='horairePh'),
     path('pharmacie/stockPH/',stockPH,name='stockPh'),
     path('pharmacie/<int:pharmacie_id>/', pharmacienV, name='pharmacie_detail'),
