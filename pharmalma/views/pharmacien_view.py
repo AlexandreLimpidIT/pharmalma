@@ -1,21 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Horaire, Pharmacie, Medicament
+from ..models import Horaire, Pharmacie, Medicament, Stock
 from ..forms import HoraireForm
 from django.contrib import messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect 
 
 def pharmacienV(request, pharmacie_id):
+    pharmacie = get_object_or_404(Pharmacie, id_pharma=pharmacie_id)
     medicaments=Medicament.objects.all()
     fragment=True
     medicamentsCon={'medicaments' :medicaments,
-                    'fragment':fragment}
+                    'fragment':fragment,
+                    'pharmacie':pharmacie}
     return render(request, './templates/pharmacie.html',medicamentsCon)
-
-from django.shortcuts import render, get_object_or_404, redirect
-from ..models import Pharmacie, Horaire
-from ..forms import HoraireForm
-from django.contrib import messages
 
 def horairePH(request, pharmacie_id):
     pharmacie = get_object_or_404(Pharmacie, id_pharma=pharmacie_id)
@@ -60,6 +57,31 @@ def stockPH(request, pharmacie_id):
         medicaments=Medicament.objects.all()
         return render(request,'./templates/stocksForm.html',{"medicaments":medicaments})
 
-def renderStockPh(request,pharmacie_id,ref_medoc):
-    medicament=Medicament.objects.get(ref_medoc=ref_medoc)
-    return HttpResponseRedirect(f"{reverse("stockPh")}?ref_medoc={ref_medoc}")
+def renderStockPh(request, pharmacie_id, ref_medoc):
+    medicament = get_object_or_404(Medicament, ref_medoc=ref_medoc)
+    pharmacie = get_object_or_404(Pharmacie, id_pharma=pharmacie_id)
+    stock = get_object_or_404(Stock, id_pharma=pharmacie, ref_medoc=medicament)
+
+    return render(request, './templates/stocksForm.html', {
+        "medicament": medicament,
+        "pharmacie": pharmacie,
+        "stock": stock
+    })
+
+def updateStock(request, pharmacie_id, ref_medoc):
+    if request.method == 'POST':
+        # Récupérer la quantité soumise
+        quantity = request.POST.get('quantity-input')
+        print(request.POST)
+        
+        # Récupérer le stock correspondant
+        stock = get_object_or_404(Stock, id_pharma__id_pharma=pharmacie_id, ref_medoc__ref_medoc=ref_medoc)
+        
+        # Mettre à jour la quantité
+        stock.qte = quantity
+        stock.save()
+        
+        # Rediriger vers la page de stock après la mise à jour
+        return redirect('leMedoc', pharmacie_id=pharmacie_id, ref_medoc=ref_medoc)
+
+    return redirect('leMedoc', pharmacie_id=pharmacie_id, ref_medoc=ref_medoc)
