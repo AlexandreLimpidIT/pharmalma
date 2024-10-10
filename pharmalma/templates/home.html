@@ -2,10 +2,157 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    {% load static %}
     <title>Bienvenue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'images/pharmacy.jpg' %}"); /* Image de fond */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        .admin-button {
+            position: absolute; /* Positionnement absolu pour placer le bouton en haut à droite */
+            top: 65px; /* Espace depuis le haut */
+            right: 20px; /* Espace depuis la droite */
+            background-color: #007bff; /* Couleur de fond du bouton */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 10px 15px; /* Espacement interne */
+            border-radius: 4px; /* Coins arrondis */
+            text-decoration: none; /* Pas de soulignement */
+            font-size: 16px; /* Taille de la police */
+        }
+        .admin-button:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
+        .pharma-button {
+            position: absolute; /* Positionnement absolu pour placer le bouton en haut à droite */
+            top: 20px; /* Espace depuis le haut */
+            right: 20px; /* Espace depuis la droite */
+            background-color: #007bff; /* Couleur de fond du bouton */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 10px 15px; /* Espacement interne */
+            border-radius: 4px; /* Coins arrondis */
+            text-decoration: none; /* Pas de soulignement */
+            font-size: 16px; /* Taille de la police */
+        }
+        .pharma-button:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* Largeur maximale du formulaire */
+            margin: auto; /* Centrer le formulaire sur la page */
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 80%; /* Réduire la largeur des inputs */
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        h2 {
+            text-align: center; /* Centrer le titre */
+            color: #333; /* Couleur du texte du titre */
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const csrfToken = '{{ csrf_token }}';
+        
+            function redirectToCarte(event) {
+                event.preventDefault(); 
+                console.log("Le bouton a été cliqué."); 
+        
+                const ville = document.getElementById("ville").value;
+                const medicament_name = document.getElementById("medicament").value;
+                console.log("Ville :", ville, "Médicament :", medicament_name); 
+        
+                fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `medicament=${encodeURIComponent(medicament_name)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau : ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Données reçues :", data);
+                    const pharmacies = data.pharmacies;
+        
+                    if (pharmacies.length > 0) {
+                        const pointsArray = pharmacies.map(pharmacy => {
+                            return { 
+                                lat: pharmacy.lat, 
+                                lng: pharmacy.lng, 
+                                nom: pharmacy.nom, 
+                                adresse: pharmacy.adresse, 
+                                telephone: pharmacy.telephone 
+                            }; 
+                        });
+        
+                        const url = new URL('/carte', window.location.origin);
+                        url.searchParams.append('points', JSON.stringify(pointsArray));
+                        url.searchParams.append('ville', encodeURIComponent(ville));
+                        window.location.href = url.toString();
+                    } else {
+                        alert('Aucune pharmacie trouvée avec ce médicament.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la requête. Vérifiez la console pour plus de détails.');
+                });
+            }
+        
+            document.querySelector('form').addEventListener('submit', redirectToCarte);
+        });
+        </script>
 </head>
 <body>
-    <h1>Bienvenue sur notre site</h1>
-    <p>Ceci est la page d'accueil.</p>
+    <!--a href="/admin" class="admin-button">Espace admin</a-->
+    <a href="{% url 'pharmacie_redirect' %}" class="pharma-button">Espace pharmacien</a>
+
+    <form onsubmit="redirectToCarte(event)">
+        <h2>Rechercher un médicament disponible proche de chez vous</h2>
+
+        <label for="ville">Ville :</label>
+        <input type="text" id="ville" name="ville" required>
+
+        <label for="medicament">Médicament :</label>
+        <input type="text" id="medicament" name="medicament" required>
+
+        <input type="submit" value="Soumettre">
+    </form>
 </body>
 </html>

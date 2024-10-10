@@ -1,5 +1,5 @@
-db.sqlite3
 /pharmalma/migrations/
 /pharmalma/models/__pycache__/
 /pharmalma/__pycache__/
 /pharmalma/views/__pycache__/
+/carte/__pycache__/

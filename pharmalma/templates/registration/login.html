@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Prend toute la hauteur de la fenêtre */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('{% static "images/background.jpg" %}'); /* Chemin vers l'image de fond */
+            background-size: cover; /* Couvre toute la surface */
+            background-position: center; /* Centre l'image */
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8); /* Fond blanc avec un peu de transparence */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function showAlert(message) {
+            alert(message);
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Connexion</h2>
+        <form method="POST" class="login-form">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+        </form>
+    </div>
+
+    {% if form.non_field_errors %}
+        <script>
+            showAlert("{{ form.non_field_errors.as_text|escapejs }}");
+        </script>
+    {% endif %}
+</body>
+</html>

@@ -5,9 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte des pharmacies</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDq4tK0ZwN8tu9ZQgF6Y3TJ2EPScOCSULk"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        #map {
+            height: 500px; /* Hauteur de la carte */
+            width: 100%; /* Largeur de la carte */
+            margin-top: 5px; /* Marge au-dessus de la carte */
+        }
+
+        #info-box {
+            border: solid 2px black; /* Épaisseur et couleur de la bordure */
+            background-color: #f9f9f9; /* Couleur de fond légèrement grise */
+            border-radius: 8px; /* Coins arrondis */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Ombre portée */
+            padding: 15px; /* Espace intérieur */
+            margin-top: 10px; /* Marge au-dessus */
+            font-family: Arial, sans-serif; /* Police du texte */
+            color: #333; /* Couleur du texte */
+        }
+
+        #info-box h3 {
+            margin-top: 0; /* Supprime la marge supérieure du titre */
+            color: #007bff; /* Couleur du titre */
+        }
+
+        #info-box p {
+            line-height: 1.5; /* Espacement entre les lignes */
+        }
+    </style>
+    
 </head>
 <body>
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <button class="back-button" onclick="window.location.href='{% url 'home' %}';">Retour à l'accueil</button>
+    <div id="map"></div>
+
+    <div id="info-box">
+        <h3>Informations de la pharmacie</h3>
+        <p><strong>Nom :</strong> <span id="pharmacy-name"></span></p>
+        <p><strong>Adresse :</strong> <span id="pharmacy-address"></span></p>
+        <p><strong>Téléphone :</strong> <span id="pharmacy-phone"></span></p>
+    </div>
 
     <script>
         function initMap() {
@@ -15,18 +73,29 @@
 
             // Si la ville a été soumise via le formulaire
             var ville = "{{ ville|escapejs }}";
-            if (ville) {
+            var pharmacies = JSON.parse('{{ points|escapejs }}'); // Récupérer les informations des pharmacies
+
+            // Créer une carte centrée sur la première pharmacie, si disponible
+            if (pharmacies.length > 0) {
                 geocoder.geocode({'address': ville}, function(results, status) {
                     if (status === 'OK') {
                         var map = new google.maps.Map(document.getElementById('map'), {
                             zoom: 15,
                             center: results[0].geometry.location
                         });
-                        var points = JSON.parse('{{ points|escapejs }}');
-                        points.forEach(function(point) {
+
+                        pharmacies.forEach(function(pharmacy) {
                             var marker = new google.maps.Marker({
-                                position: point,
+                                position: { lat: pharmacy.lat, lng: pharmacy.lng },
                                 map: map
+                            });
+
+                            // Ajouter un écouteur d'événements pour le clic sur le marqueur
+                            marker.addListener('click', function() {
+                                // Afficher les informations de la pharmacie dans l'encadré
+                                document.getElementById('pharmacy-name').textContent = pharmacy.nom;
+                                document.getElementById('pharmacy-address').textContent = pharmacy.adresse;
+                                document.getElementById('pharmacy-phone').textContent = '0' +String(pharmacy.telephone);
                             });
                         });
                     } else {
@@ -39,20 +108,11 @@
                     zoom: 2,
                     center: { lat: 20.0, lng: 0.0 }  // Coordonnées du centre par défaut
                 });
-
-                var points = JSON.parse('{{ points|escapejs }}');
-                points.forEach(function(point) {
-                    var marker = new google.maps.Marker({
-                        position: point,
-                        map: map
-                    });
-                });
             }
         }
 
         // Initialiser la carte quand la page est chargée
         window.onload = initMap;
     </script>
-    
 </body>
 </html>

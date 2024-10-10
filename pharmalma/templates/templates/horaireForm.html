@@ -1,0 +1,51 @@
+{% extends 'templates/pharmacie.html'%}
+{% block content %}
+<h2>Horaires de la Pharmacie: {{ pharmacie.nom_pharma }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="jour">Sélectionner le jour:</label>
+    <select name="jour" required>
+        {% for jour in jours %}
+            <option value="{{ jour }}">{{ jour }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Afficher Horaires</button>
+</form>
+
+{% if horaires %}
+    <h3>Horaires pour {{ selected_jour }}:</h3>
+    <table>
+        <tr>
+            <th>Période</th>
+            <th>Heure Début</th>
+            <th>Heure Fin</th>
+            <th>Modifier</th>
+        </tr>
+        {% for horaire in horaires %}
+            <tr>
+                <td>{{ horaire.periode }}</td>
+                <form method="post" action="{% url 'modifier_horaire' pharmacie.id_pharma horaire.id %}">
+                    {% csrf_token %}
+                    <td>
+                        <input type="time" name="h_debut" value="{{ horaire.h_debut|slice:':5' }}"> <!-- Pré-remplir -->
+                    </td>
+                    <td>
+                        <input type="time" name="h_fin" value="{{ horaire.h_fin|slice:':5' }}"> <!-- Pré-remplir -->
+                    </td>
+                    <td>
+                        <button type="submit">Modifier</button>
+                    </td>
+                </form>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}
