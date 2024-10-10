@@ -48,15 +48,6 @@ def modifier_horaire(request, pharmacie_id, horaire_id):
     # Redirection après modification
     return redirect('horairePH', pharmacie_id=pharmacie_id)
 
-def stockPH(request, pharmacie_id):
-    ref_medoc=request.GET.get('ref_medoc')
-    if ref_medoc:
-        medicament=Medicament.objects.get(ref_medoc=ref_medoc)
-        return render(request,'./templates/stocksForm.html',{"medicament":medicament})
-    else:
-        medicaments=Medicament.objects.all()
-        return render(request,'./templates/stocksForm.html',{"medicaments":medicaments})
-
 def renderStockPh(request, pharmacie_id, ref_medoc):
     medicament = get_object_or_404(Medicament, ref_medoc=ref_medoc)
     pharmacie = get_object_or_404(Pharmacie, id_pharma=pharmacie_id)
