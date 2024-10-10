@@ -1,9 +1,9 @@
 from django.db import models
-from .phamacies import Pharmacies
+from .phamacies import Pharmacie
 
-class Horiares(models.Model):
+class Horaire(models.Model):
 
-    id_pharma=models.ForeignKey(Pharmacies,on_delete=models.CASCADE)
+    id_pharma=models.ForeignKey(Pharmacie,on_delete=models.CASCADE)
     jour=models.CharField(max_length=8)
     garde=models.BooleanField(default=False)
     periode=models.CharField(max_length=5)

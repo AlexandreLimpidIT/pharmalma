@@ -15,18 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from .views.pharmacien_view import pharmacienV,stockPH,horairePH,renderStockPh,modifStock
-from .views import product_list, home
+from .views.pharmacien_view import pharmacienV, stockPH, horairePH, modifier_horaire, renderStockPh, updateStock
+from .views.home_views import home, pharmacie_redirect_view
 from django.urls import path, include
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('products/', product_list, name="product_list"),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('carte/', include('carte.urls')),
-    path('pharmacie/',pharmacienV,name='pharmacie'),
-    path('pharmacie/horairePH/',horairePH,name='horairePh'),
-    path('pharmacie/stockPH/',stockPH,name='stockPh'),
-    path('pharmacie/stockPH/modifStock',modifStock,name='modifStock'),
-    path('pharmacie/<str:ref_medoc>/stockPh',renderStockPh,name='leMedoc')
+    path('pharmacie/<int:pharmacie_id>/horairePH/',horairePH,name='horairePh'),
+    path('pharmacie/<int:pharmacie_id>/modifier_horaire/<int:horaire_id>/', modifier_horaire, name='modifier_horaire'),
+    path('pharmacie/<int:pharmacie_id>/stockPH/',stockPH,name='stockPh'),
+    path('pharmacie/<int:pharmacie_id>/stockPh/<str:ref_medoc>',renderStockPh,name='leMedoc'),
+    path('pharmacie/<int:pharmacie_id>/stockPh/<str:ref_medoc>/update/', updateStock, name='update_stock'),
+    path('pharmacie/<int:pharmacie_id>/', pharmacienV, name='pharmacie_detail'),
+    path('redirect/', pharmacie_redirect_view, name='pharmacie_redirect'),
 ]
