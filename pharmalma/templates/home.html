@@ -2,13 +2,27 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
+=======
+    {% load static %}
+>>>>>>> maher
     <title>Bienvenue</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+<<<<<<< HEAD
             background-color: #f4f4f4;
             padding: 20px;
             position: relative; /* Pour positionner le bouton */
+=======
+            background-image: url("{% static 'images/pharmacy.jpg' %}"); /* Image de fond */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            padding: 20px;
+            position: relative;
+>>>>>>> maher
         }
         .admin-button {
             position: absolute; /* Positionnement absolu pour placer le bouton en haut à droite */
@@ -135,7 +149,11 @@
         </script>
 </head>
 <body>
+<<<<<<< HEAD
     <!--a href="/admin" class="admin-button">Espace admin</a-->
+=======
+    <a href="/admin" class="admin-button">Espace admin</a>
+>>>>>>> maher
     <a href="{% url 'pharmacie_redirect' %}" class="pharma-button">Espace pharmacien</a>
 
     <form onsubmit="redirectToCarte(event)">
@@ -151,3 +169,10 @@
     </form>
 </body>
 </html>
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> maher
