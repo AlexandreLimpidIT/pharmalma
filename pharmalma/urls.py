@@ -16,14 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from .views.pharmacien_view import pharmacienV,stockPH,horairePH
-from .views import home
+from .views.home_views import home, pharmacie_redirect_view
 from django.urls import path, include
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('carte/', include('carte.urls')),
-    path('pharmacie/',pharmacienV,name='pharmacie'),
+    #path('pharmacie/',pharmacienV,name='pharmacie'),
     path('pharmacie/horairePH/',horairePH,name='horairePh'),
-    path('pharmacie/stockPH/',stockPH,name='stockPh')
+    path('pharmacie/stockPH/',stockPH,name='stockPh'),
+    path('pharmacie/<int:pharmacie_id>/', pharmacienV, name='pharmacie_detail'),
+    path('redirect/', pharmacie_redirect_view, name='pharmacie_redirect'),
 ]

@@ -136,7 +136,7 @@
 </head>
 <body>
     <a href="/admin" class="admin-button">Espace admin</a>
-    <a href="/pharmacie" class="pharma-button">Espace pharmacien</a>
+    <a href="{% url 'pharmacie_redirect' %}" class="pharma-button">Espace pharmacien</a>
 
     <form onsubmit="redirectToCarte(event)">
         <h2>Rechercher un médicament disponible proche de chez vous</h2>

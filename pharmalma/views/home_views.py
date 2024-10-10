@@ -1,9 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from ..models import Pharmacie, Stock, Medicament
 import requests
 
 def home(request):
+    if request.user.is_authenticated:
+        logout(request)
+
     if request.method == 'POST':
         product_name = request.POST.get('medicament')  # Récupère le nom du médicament
         pharmacies_info = []  # Liste pour stocker les informations des pharmacies
@@ -38,3 +45,14 @@ def home(request):
         return JsonResponse({'pharmacies': pharmacies_info})
 
     return render(request, 'home.html')
+
+@login_required(login_url='/accounts/login')
+def pharmacie_redirect_view(request):
+    # Récupérer la pharmacie associée à l'utilisateur connecté
+    try:
+        pharmacie = Pharmacie.objects.get(id_pharmacien=request.user)
+        # Rediriger vers une URL contenant l'ID de la pharmacie
+        return redirect(reverse('pharmacie_detail', kwargs={'pharmacie_id': pharmacie.id_pharma}))
+    except Pharmacie.DoesNotExist:
+        # Gérer le cas où l'utilisateur n'a pas de pharmacie associée
+        return redirect('no_pharmacie')  # Ou tout autre comportement souhaité
