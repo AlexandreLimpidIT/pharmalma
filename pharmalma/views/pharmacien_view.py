@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Horaire, Pharmacie
+from ..models import Horaire, Pharmacie, Medicament
 from ..forms import HoraireForm
 from django.contrib import messages
+from django.urls import reverse
+from django.http import HttpResponseRedirect 
 
 def pharmacienV(request, pharmacie_id):
-    return render(request, './templates/pharmacie.html')
+    medicaments=Medicament.objects.all()
+    fragment=True
+    medicamentsCon={'medicaments' :medicaments,
+                    'fragment':fragment}
+    return render(request, './templates/pharmacie.html',medicamentsCon)
 
 from django.shortcuts import render, get_object_or_404, redirect
 from ..models import Pharmacie, Horaire
@@ -46,4 +52,14 @@ def modifier_horaire(request, pharmacie_id, horaire_id):
     return redirect('horairePH', pharmacie_id=pharmacie_id)
 
 def stockPH(request, pharmacie_id):
-    return render(request,'./templates/stocksForm.html')
+    ref_medoc=request.GET.get('ref_medoc')
+    if ref_medoc:
+        medicament=Medicament.objects.get(ref_medoc=ref_medoc)
+        return render(request,'./templates/stocksForm.html',{"medicament":medicament})
+    else:
+        medicaments=Medicament.objects.all()
+        return render(request,'./templates/stocksForm.html',{"medicaments":medicaments})
+
+def renderStockPh(request,pharmacie_id,ref_medoc):
+    medicament=Medicament.objects.get(ref_medoc=ref_medoc)
+    return HttpResponseRedirect(f"{reverse("stockPh")}?ref_medoc={ref_medoc}")
