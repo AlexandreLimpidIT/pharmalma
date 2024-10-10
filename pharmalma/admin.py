@@ -10,8 +10,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Horiares)
 class HoraireAdmin(admin.ModelAdmin):
-    list_display = ('id_pharma', 'jour', 'periode','h_debut','h_fin')  
-    search_fields = ('id_pharma', 'jour', 'periode','h_debut','h_fin')
+    list_display = ('id_pharma', 'jour', 'garde','periode','h_debut','h_fin')  
+    search_fields = ('id_pharma', 'jour', 'garde','periode','h_debut','h_fin')
 @admin.register(Medicaments)
 class MedicamentAdmin(admin.ModelAdmin):
     list_display = ('ref_medoc', 'nom_medoc')  

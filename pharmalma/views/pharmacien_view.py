@@ -25,3 +25,12 @@ def stockPH(request):
 def renderStockPh(request,ref_medoc):
     medicament=Medicaments.objects.get(ref_medoc=ref_medoc)
     return HttpResponseRedirect(f"{reverse("stockPh")}?ref_medoc={ref_medoc}")
+
+def modifStock(request):
+    medica=request.POST.get("ref_medoc")
+    medicament=Medicaments.objects.filter(ref_medoc=medica).first()
+    quantite=request.POST.get("qte")
+    pharmacie=1
+    pharmaFormStc=pharmaFormStc(ref_medoc=medicament,id_pharma=pharmacie,qte=quantite,)
+    pharmaFormStc.save()
+    return HttpResponseRedirect(reverse("stockPh"))
