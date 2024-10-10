@@ -10,7 +10,7 @@
         <select name="medicament" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {%if medicaments%}
             {% for i in medicaments%}
-            <option value="{{i.ref_medoc}}">{{i.nom_medoc}}</option>
+            <option value="{{i.ref_medoc}}" >{{i.nom_medoc}}</option>
             {%endfor%}
             {%else%}
             <option value="{{medicament.ref_medoc}}">{{medicament.nom_medoc}}</option>
