@@ -26,7 +26,7 @@
                     <li>
                         <ul role="list" class="space-y-2">
                         <ul role="list" class="space-y-2">
-                                <a href="{%url 'horairePh'%}"
+                                <a href="{% url 'horairePh' pharmacie.id_pharma %}"
                                     class="text-gray-700 hover:text-blue-900 hover:bg-gray-50 group flex gap-x-3 rounded-md p-3 text-sm leading-6 ">
                                     <svg class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-blue-900" fill="none"
                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -38,7 +38,7 @@
                             </li>
                         </ul>
                         <ul role="list" class="space-y-2">
-                            <a href="{%url 'stockPh'%}"
+                            <a href="{% url 'stockPh' pharmacie.id_pharma %}"
                                 class="text-gray-700 hover:text-blue-900 hover:bg-gray-50 group flex gap-x-3 rounded-md p-3 text-sm leading-6 ">
                                 <svg class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-blue-900" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
