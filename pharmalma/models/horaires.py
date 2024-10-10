@@ -5,6 +5,7 @@ class Horaire(models.Model):
 
     id_pharma=models.ForeignKey(Pharmacie,on_delete=models.CASCADE)
     jour=models.CharField(max_length=8)
+    garde=models.BooleanField(default=False)
     periode=models.CharField(max_length=5)
     h_debut=models.TimeField()
     h_fin=models.TimeField()
