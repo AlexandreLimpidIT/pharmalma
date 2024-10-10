@@ -1,1 +1,1 @@
-web: gunicorn mon_projet.wsgi --log-file -
+web: gunicorn pharmalma.wsgi --log-file -
