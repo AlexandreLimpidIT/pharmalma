@@ -1,10 +1,27 @@
 from django.shortcuts import render
+from ..models import Pharmacies,Product,Medicaments,Stocks,Horiares
+from django.urls import reverse
+from django.http import HttpResponseRedirect 
 
 def pharmacienV(request):
-    return render(request, './templates/pharmacie.html')
+    medicaments=Medicaments.objects.all()
+    fragment=True
+    medicamentsCon={'medicaments' :medicaments,
+                    'fragment':fragment}
+    return render(request, './templates/pharmacie.html',medicamentsCon)
 
 def horairePH(request):
     return render(request,'./templates/horaireForm.html')
 
 def stockPH(request):
-    return render(request,'./templates/stocksForm.html')
+    ref_medoc=request.GET.get('ref_medoc')
+    if ref_medoc:
+        medicament=Medicaments.objects.get(ref_medoc=ref_medoc)
+        return render(request,'./templates/stocksForm.html',{"medicament":medicament})
+    else:
+        medicaments=Medicaments.objects.all()
+        return render(request,'./templates/stocksForm.html',{"medicaments":medicaments})
+
+def renderStockPh(request,ref_medoc):
+    medicament=Medicaments.objects.get(ref_medoc=ref_medoc)
+    return HttpResponseRedirect(f"{reverse("stockPh")}?ref_medoc={ref_medoc}")
