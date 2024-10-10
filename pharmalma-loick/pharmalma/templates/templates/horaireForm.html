@@ -1,0 +1,90 @@
+{% extends 'templates/pharmacie.html'%}
+{% block content %}
+<div class="p-10">
+<form method="POST" class="space-y-6">
+    {% csrf_token %}
+    
+    <!-- Afficher les jours de la semaine -->
+    <div>
+        <label class="block text-lg font-semibold mb-2">Jour :</label>
+        <select name="day" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="monday">Lundi</option>
+            <option value="tuesday">Mardi</option>
+            <option value="wednesday">Mercredi</option>
+            <option value="thursday">Jeudi</option>
+            <option value="friday">Vendredi</option>
+            <option value="saturday">Samedi</option>
+            <option value="sunday">Dimanche</option>
+        </select>
+    </div>
+
+    <!-- les jours -->
+    <div class="flex items-center">
+        <input type="checkbox" name="is_open" id="is_open" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+        <label for="is_open" class="ml-2 block text-sm text-gray-900">Est de garde</label>
+    </div>
+
+    <!-- Les Heures-->
+    <div class="flex space-x-4">
+        <div class="w-1/2">
+            <label for="open_time" class="block text-lg font-semibold mb-2">Heure d'ouverture matin :</label>
+            <input type="time" name="open_time" min="00:00" max="12:59" id="open_time_morning" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="w-1/2">
+            <label for="close_time" class="block text-lg font-semibold mb-2">Heure de fermeture matin :</label>
+            <input type="time" name="close_time" min="00:00" max="12:59" id="close_time_morning" class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+    </div>
+
+    <div class="flex space-x-4">
+        <div class="w-1/2">
+            <label for="open_time" class="block text-lg font-semibold mb-2">Heure d'ouverture soir :</label>
+            <input type="time" name="open_time" id="open_time_afternoon" min="13:00" max="23:59"  class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="w-1/2">
+            <label for="close_time" class="block text-lg font-semibold mb-2">Heure de fermeture soir :</label>
+            <input type="time" name="close_time" id="close_time_afternoon" min="13:00" max="23:59"  class="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+    </div>
+
+    <div class="relative">
+        <span class="absolute start-0 bottom-3 text-gray-500 dark:text-gray-400">
+            <svg class="w-4 h-4 rtl:rotate-[270deg]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 19 18">
+                <path d="M18 13.446a3.02 3.02 0 0 0-.946-1.985l-1.4-1.4a3.054 3.054 0 0 0-4.218 0l-.7.7a.983.983 0 0 1-1.39 0l-2.1-2.1a.983.983 0 0 1 0-1.389l.7-.7a2.98 2.98 0 0 0 0-4.217l-1.4-1.4a2.824 2.824 0 0 0-4.218 0c-3.619 3.619-3 8.229 1.752 12.979C6.785 16.639 9.45 18 11.912 18a7.175 7.175 0 0 0 5.139-2.325A2.9 2.9 0 0 0 18 13.446Z"/>
+            </svg>
+        </span>
+        <input type="text" id="floating-phone-number" class="block py-2.5 ps-6 pe-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder=" " />
+        <label for="floating-phone-number" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-placeholder-shown:start-6 peer-focus:start-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">Phone number</label>
+    </div>
+    <div class="flex justify-center">
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Sauvegarder</button>
+    </div>.
+
+    <script>
+        document.getElementById('horaireForm').addEventListener('submit',function(event){
+            const open_time_morning=document.getElementById('open_time_morning').value;
+            const close_time_morning=document.getElementById('close_time_morning').value;
+            const open_time_afternoon=document.getElementById('open_time_afternoon').value;
+            const close_time_afternoon=document.getElementById('close_time_afternoon').value;
+            errorMessage.textContent='';
+            if(open_time_afternoon && close_time_afternoon && close_time_morning<= open_time_morning){
+                errorMessage.textContent='l\'heure d\'ouverture du matin doit etre inferieur aux autres heures'
+                event.preventDefault();
+                return;
+            }
+            if(open_time_afternoon && close_time_afternoon <= close_time_morning){
+                errorMessage.textContent='l\'heure de fermeture du matin doit etre inferieur aux autres heures'
+                event.preventDefault();
+                return;
+            }
+            if(open_time_afternoon >= close_time_afternoon){
+                errorMessage.textContent='l\'heure d\'ouverture du soir doit etre inferieur a celle de la fermeture'
+                event.preventDefault();
+                return;
+            }                        
+        })
+
+    </script>
+</form>
+</div>
+{%endblock%}
